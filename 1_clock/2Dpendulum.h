@@ -46,8 +46,9 @@ class SecondPendulum {
             drawLine(point(0, 0), bob);
             glPushMatrix();
             {
+                drawFilledCircle(0.02, 10);
                 glTranslatef(bob.x, bob.y, 0);
-                drawCircle(pendulum_bob_radius, steps_to_draw);
+                drawFilledCircle(pendulum_bob_radius, steps_to_draw);
             }
             glPopMatrix();
         }

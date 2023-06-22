@@ -9,7 +9,6 @@
 
 
 void drawLine(point a, point b) {
-    // cout << a.x << " " << b.x << endl;
     glBegin(GL_LINES); {
         glVertex2f(a.x, a.y);
         glVertex2f(b.x, b.y);
@@ -35,8 +34,6 @@ void drawQuad(point a, point b, point c, point d) {
 }
 
 void drawCircle(GLfloat r, int steps) {
-    // cout << "hello\n";
-    // drawLine(point(0, 0), point(0.5, 0));
     point prev, cur;
     GLfloat theta = 0.0;
     GLfloat eachStep = 2*PI/steps;
@@ -49,6 +46,20 @@ void drawCircle(GLfloat r, int steps) {
         drawLine(prev, cur);
         prev = cur;
     }
+}
+
+void drawFilledCircle(GLfloat r, int steps) {
+	glBegin(GL_TRIANGLE_FAN);
+	{
+		glVertex2f(0.0, 0.0);
+        GLfloat theta = 0.0;
+        GLfloat eachStep = 2*PI/steps;
+        for(int i=0;i<=steps;i++) {
+            glVertex2f(r*cos(theta), r*sin(theta));
+            theta += eachStep;
+        }
+	}
+	glEnd();
 }
 
 #endif

@@ -356,6 +356,14 @@ void init(){
 	//far distance
 }
 
+void filledCircle(int r, int steps) {
+	glBegin(GL_TRIANGLE_FAN);
+	{
+		
+	}
+	glEnd();
+}
+
 int main(int argc, char **argv){
 	glutInit(&argc,argv);
 	glutInitWindowSize(500, 500);

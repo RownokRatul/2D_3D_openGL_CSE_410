@@ -91,6 +91,7 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    // drawFilledCircle(0.3, 20);
     makeClock();
     pendulum.drawBob();
 
