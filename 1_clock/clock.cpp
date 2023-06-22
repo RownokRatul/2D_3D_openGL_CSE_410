@@ -85,8 +85,8 @@ void idle() {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0, 0, 0, 0); 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClearColor(0, 0, 0, 0); 
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -98,12 +98,13 @@ void display() {
     glutSwapBuffers();
 }
 
-void gl_init(int argc, char* argv[]) {
-    glutInit(&argc, argv);
+void gl_init(int pargc, char* pargv[]) {
+    glutInit(&pargc, pargv);
     glutInitWindowSize(700, 700);
     glutInitWindowPosition(0, 0);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
     glutCreateWindow("Clock");
+    glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
 }
 
