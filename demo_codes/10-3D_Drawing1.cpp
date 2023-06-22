@@ -1,6 +1,7 @@
 // #include <windows.h>  // for MS Windows
 #include <GL/glut.h>  // GLUT, include glu.h and gl.h
 #include <cmath>
+#include <stdio.h>
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -17,7 +18,7 @@ bool isAxes = true, isCube = false, isPyramid = false;
 
 /* Draw axes: X in Red, Y in Green and Z in Blue */
 void drawAxes() {
-    glLineWidth(3);
+    // glLineWidth(3);
     glBegin(GL_LINES);
         glColor3f(1,0,0);   // Red
         // X axis
@@ -247,9 +248,11 @@ void specialKeyListener(int key, int x,int y) {
     case GLUT_KEY_LEFT:
         eyex += v * (upy*lz);
         eyez += v * (-lx*upy);
+        printf("%f %f %f", eyex, eyez, lx);
         s = sqrt(eyex*eyex + eyez*eyez) / (4 * sqrt(2));
         eyex /= s;
         eyez /= s;
+        printf("%f %f %f", eyex, eyez, s);
         break;
     case GLUT_KEY_RIGHT:
         eyex += v * (-upy*lz);
