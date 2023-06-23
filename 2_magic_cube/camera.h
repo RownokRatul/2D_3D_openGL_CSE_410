@@ -13,11 +13,13 @@ class Camera {
         point3d eye;
         point3d centre;
         point3d up;
+        point3d right;
 
-        Camera(point3d e, point3d c, point3d u) {
+        Camera(point3d e, point3d c, point3d u, point3d r) {
             eye = e;
             centre = c;
             up = u;
+            right = r;
         }
 
         Camera() {

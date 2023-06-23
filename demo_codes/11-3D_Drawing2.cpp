@@ -257,7 +257,7 @@ void display() {
               u.x,u.y,u.z);
     // draw
     // drawSphere(5,100,100);
-    // drawCylinder(2, 3, 100);
+    drawCylinder(2, 3, 100);
 
     glutSwapBuffers();  // Render now
 }
