@@ -56,6 +56,31 @@ void rotate_eye_left_right(GLfloat l_r) {
     camera.eye.z /= s;
 }
 
+bool boundCheck(GLfloat x, GLfloat eps, GLfloat t) {
+    if(x > t+eps || x < t-eps) {
+        return false;
+    }
+    return true;
+}
+
+void octahedronToSphere() {
+    printf("o to S\n");
+    if(currentTriangleScale > 0) {
+        currentTriangleScale--;
+        currentSphereScale--;
+        currentCylinderScale--;
+    }
+}
+
+void sphereToOctahedron() {
+    printf("s to o\n");
+    if(currentTriangleScale < SCALE_SUBDIVISION) {
+        currentTriangleScale++;
+        currentSphereScale++;
+        currentCylinderScale++;
+    }
+}
+
 void usualKeyListener(unsigned char key, int x, int y) {
     GLfloat del = 0.2;
     switch(key) {
@@ -78,6 +103,12 @@ void usualKeyListener(unsigned char key, int x, int y) {
         case '5':
             break;
         case '6':
+            break;
+        case ',':
+            octahedronToSphere();
+            break;
+        case '.':
+            sphereToOctahedron();
             break;
     }
     glutPostRedisplay();

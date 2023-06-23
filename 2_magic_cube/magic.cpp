@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 void reshapeListener(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
     // Compute aspect ratio of the new window
     if (height == 0) height = 1;                // To prevent divide by 0
@@ -33,6 +34,106 @@ void idle() {
 
 }
 
+
+// let the sphere centre move from 0, 0, 0 to 1, 0, 0 unitarily.
+// similarly, let the radius scale from "base_radius" to 0;
+void fillSphere() {
+    glPushMatrix();
+        GLfloat scaledRadius = sphere_base_radius - ((sphere_base_radius - 0.0)*currentSphereScale/SCALE_SUBDIVISION);
+        GLfloat toTranslate = 0.0 + currentSphereScale*(1.0 - 0.0)/SCALE_SUBDIVISION;
+        bool t = 1;
+        // side faces
+        for(int i=0;i<4;i++) {
+            glPushMatrix();
+                glColor3f(t, !t, 0);
+                glTranslatef(toTranslate, 0, 0);
+                drawCubeSphereFace(scaledRadius);
+            glPopMatrix();
+            t = !t;
+            glRotatef(90.0, 0, 1, 0);
+        }
+        // top faces
+        for(int i=0;i<2;i++) {
+            glRotatef(90.0*(i+1), 0, 0, 1);
+            glPushMatrix();
+                glColor3f(0, 0, 1);
+                glTranslatef(toTranslate, 0 ,0);
+                drawCubeSphereFace(scaledRadius);
+            glPopMatrix();
+        }
+    glPopMatrix();
+
+} 
+
+// let the cylinder radius increases from 0.0 to "base_radius"
+// let the cylinder height decreases from "base_h" to 0.0
+// translation from centre of hypotenuse of triangle to origin
+void fillCylinder() {
+    GLfloat scaledRadius = cylinder_base_radius - (cylinder_base_radius - 0.0)*(currentCylinderScale*1.0/SCALE_SUBDIVISION);
+    GLfloat scaledHeight = 0.0 + (cylinder_base_height - 0.0)*(currentCylinderScale*1.0/SCALE_SUBDIVISION);
+    GLfloat originNormalToHypotenuse = sqrt(2*0.5*0.5);
+    GLfloat toTranslate = 0.0 + (originNormalToHypotenuse - 0.0)*(currentCylinderScale*1.0/SCALE_SUBDIVISION);
+        
+    // 12 cylinder, 4 on each xz, yz, xy plane
+    // int xz = 1;
+    // int yz = 0;
+    // int xy = 0;
+    // for(int j=0;j<2;j++) {
+    //     // draw on each plane-> xz, yz, xy
+    //     // xz
+    //     glPushMatrix();
+    //     glRotatef(45.0, yz, xz, xy);
+    //     for(int i=0;i<4;i++) {
+    //         glPushMatrix();
+    //             glTranslatef(xz*1.0*toTranslate, yz*1.0*toTranslate, xy*1.0*toTranslate);
+    //             drawCylinder(scaledHeight, scaledRadius, CYLINDER_SUBDIVISION);
+    //         glPopMatrix();
+    //         glRotatef(90.0, yz, xz, xy); 
+    //     }
+    //     glPopMatrix();
+    //     // rotate (xz, yz, xy) = (1, 0, 0) to (0, 1, 0) to (0, 0, 1)
+    //     int temp = xy;
+    //     xy = yz;
+    //     yz = xz;
+    //     xz = temp;
+    //     printf("%d %d %d\n", xz, yz, xy);
+    // }
+    // xz plane
+    glPushMatrix();
+        glRotatef(45.0, 0, 1, 0);
+        for(int i=0;i<4;i++) {
+            glPushMatrix();
+                glTranslatef(toTranslate, 0, 0);
+                drawCylinder(scaledHeight, scaledRadius, CYLINDER_SUBDIVISION);
+            glPopMatrix();
+            glRotatef(90.0, 0, 1, 0); 
+        }
+    glPopMatrix();
+    // yz plane
+    glPushMatrix();
+        glRotatef(45.0, 1, 0, 0);
+        for(int i=0;i<4;i++) {
+            glPushMatrix();
+                glTranslatef(0, toTranslate, 0);
+                drawCylinder(scaledHeight, scaledRadius, CYLINDER_SUBDIVISION);
+            glPopMatrix();
+            glRotatef(90.0, 1, 0, 0);
+        }
+    glPopMatrix();
+    // xy plane
+    glPushMatrix();
+        glRotatef(90.0, 0, 1, 0);
+        glRotatef(45.0, 1, 0, 0);
+        for(int i=0;i<4;i++) {
+            glPushMatrix();
+                glTranslatef(0, toTranslate, 0);
+                drawCylinder(scaledHeight, scaledRadius, CYLINDER_SUBDIVISION);
+            glPopMatrix();
+            glRotatef(90.0, 1, 0, 0);
+        }
+    glPopMatrix();
+}
+
 void display() {
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -46,7 +147,8 @@ void display() {
 
     drawAxes();
     drawOctahedron();
-    // drawPyramid();
+    fillSphere();
+    fillCylinder();
 
     glutSwapBuffers();
 }
