@@ -39,7 +39,7 @@ class SecondPendulum {
         }
 
         void drawBob() {
-            t += PI/100;
+            t += (PI/100)/2;
             // cout << t << endl;
             point bob = bobPosition(t);
             // cout << bob.x << " " << bob.y << "\n";

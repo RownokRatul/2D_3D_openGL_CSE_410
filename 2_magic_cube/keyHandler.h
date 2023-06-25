@@ -5,84 +5,72 @@
 #include <cmath>
 #include <stdio.h>
 #include "config.h"
+#include "vector.h"
 
-void specialKeyListener(int key, int x, int y) {
-    GLfloat eyeToCentre_x = camera.centre.x - camera.eye.x;
-    GLfloat eyeToCentre_y = camera.centre.z - camera.eye.z;
-    GLfloat proj;
-
-    switch(key) {
-        case GLUT_KEY_UP:
-            camera.eye.x += camera.centre.x;
-            camera.eye.y += camera.centre.y;
-            camera.eye.z += camera.centre.z;
-            break;
-        case GLUT_KEY_DOWN:
-            camera.eye.x -= camera.centre.x;
-            camera.eye.y -= camera.centre.y;
-            camera.eye.z -= camera.centre.z;
-            break;
-        case GLUT_KEY_LEFT:
-            camera.eye.x += camera.right.x;
-            camera.eye.y += camera.right.y;
-            camera.eye.z += camera.right.z;
-            break;
-        case GLUT_KEY_RIGHT:
-            camera.eye.x -= camera.right.x;
-            camera.eye.y -= camera.right.y;
-            camera.eye.z -= camera.right.z;
-            break;
-        case GLUT_KEY_PAGE_UP:
-            camera.eye.x += camera.up.x;
-            camera.eye.y += camera.up.y;
-            camera.eye.z += camera.up.z;
-            break;
-        case GLUT_KEY_PAGE_DOWN:
-            camera.eye.x -= camera.up.x;
-            camera.eye.y -= camera.up.y;
-            camera.eye.z -= camera.up.z;
-            break;
-        
-    }
-
-    glutPostRedisplay();
+void updateRightVector() {
+    camera.right = cross_product(camera.eyeToCentreVector(), camera.up);
+    // printf("%f %f %f\n", camera.right.x, camera.right.y, camera.right.z);
 }
 
 void rotate_eye_left_right(GLfloat f) {
-    camera.right.x = camera.right.x*cos(f*DEL)+camera.centre.x*sin(f*DEL);
-    camera.right.y = camera.right.y*cos(f*DEL)+camera.centre.y*sin(f*DEL);
-    camera.right.z = camera.right.z*cos(f*DEL)+camera.centre.z*sin(f*DEL);
-
-    camera.centre.x = camera.centre.x*cos(f*DEL)-camera.right.x*sin(f*DEL);
-    camera.centre.y = camera.centre.y*cos(f*DEL)-camera.right.y*sin(f*DEL);
-    camera.centre.z = camera.centre.z*cos(f*DEL)-camera.right.z*sin(f*DEL);
+    GLfloat theta = f*DEL*0.2;
+    point3d shifted_centre = point3d(camera.centre.x-camera.eye.x, camera.centre.y-camera.eye.y, camera.centre.z-camera.eye.z);
+    point3d rotated_centre = Rodrigues_formula(shifted_centre, camera.up, theta);
+    camera.centre = addVector(rotated_centre, camera.eye); 
+    updateRightVector();
 }
 
 void rotate_eye_up_down(GLfloat f) {
-    camera.centre.x = camera.centre.x*cos(f*DEL)+camera.up.x*sin(f*DEL);
-    camera.centre.y = camera.centre.y*cos(f*DEL)+camera.up.y*sin(f*DEL);
-    camera.centre.z = camera.centre.z*cos(f*DEL)+camera.up.z*sin(f*DEL);
-
-    camera.up.x = camera.up.x*cos(f*DEL)-camera.centre.x*sin(f*DEL);
-    camera.up.y = camera.up.y*cos(f*DEL)-camera.centre.y*sin(f*DEL);
-    camera.up.z = camera.up.z*cos(f*DEL)-camera.centre.z*sin(f*DEL);
+    updateRightVector();
+    GLfloat theta = f*DEL*0.2;
+    point3d shifted_centre = point3d(camera.centre.x-camera.eye.x, camera.centre.y-camera.eye.y, camera.centre.z-camera.eye.z);
+    point3d rotated_centre = Rodrigues_formula(shifted_centre, camera.right, theta);
+    camera.centre = addVector(rotated_centre, camera.eye);
 }
 
 void tilt_eye(GLfloat f) {
-    camera.up.x = camera.up.x*cos(f*DEL)+camera.right.x*sin(f*DEL);
-    camera.up.y = camera.up.y*cos(f*DEL)+camera.right.y*sin(f*DEL);
-    camera.up.z = camera.up.z*cos(f*DEL)+camera.right.z*sin(f*DEL);
-
-    camera.right.x = camera.right.x*cos(f*DEL)-camera.up.x*sin(f*DEL);
-    camera.right.y = camera.right.y*cos(f*DEL)-camera.up.y*sin(f*DEL);
-    camera.right.z = camera.right.z*cos(f*DEL)-camera.up.z*sin(f*DEL);
+    GLfloat theta = f*DEL*0.2;
+    point3d rotated_up = Rodrigues_formula(camera.up, camera.eyeToCentreVector(), theta);
+    camera.up = rotated_up;
+    updateRightVector();
 }
 
-bool boundCheck(GLfloat x, GLfloat eps, GLfloat t) {
-    if(x > t+eps || x < t-eps) {
-        return false;
-    }
-    return true;
+
+void translate_eye_right_left(GLfloat f) {
+    updateRightVector();
+    camera.centre.x += f*DEL*camera.right.x;
+    camera.centre.y += f*DEL*camera.right.y;
+    camera.centre.z += f*DEL*camera.right.z;
+
+    camera.eye.x += f*DEL*camera.right.x;
+    camera.eye.y += f*DEL*camera.right.y;
+    camera.eye.z += f*DEL*camera.right.z;
+}
+
+void translate_eye_forward_backward(GLfloat f) {
+    point3d dir = camera.eyeToCentreVector();
+    camera.eye.x += f*dir.x*DEL;
+    camera.eye.y += f*dir.y*DEL;
+    camera.eye.z += f*dir.z*DEL;
+
+    camera.centre.x += f*dir.x*DEL;
+    camera.centre.y += f*dir.y*DEL;
+    camera.centre.z += f*dir.z*DEL;
+}
+
+void translate_eye_up_down(GLfloat f) {
+    camera.eye.x += f*camera.up.x*DEL;
+    camera.eye.y += f*camera.up.y*DEL;
+    camera.eye.z += f*camera.up.z*DEL;
+
+    camera.centre.x += f*camera.up.x*DEL;
+    camera.centre.y += f*camera.up.y*DEL;
+    camera.centre.z += f*camera.up.z*DEL;
+}
+
+void fixed_reference_move_upDown(GLfloat f) {
+    camera.eye.y += f*DEL;
+    camera.up = cross_product(camera.right, camera.eyeToCentreVector());
 }
 
 void octahedronToSphere() {
@@ -105,14 +93,19 @@ void sphereToOctahedron() {
 
 void usualKeyListener(unsigned char key, int x, int y) {
     switch(key) {
+        case 'a':
+            xz_plane_rotation--;
+            break;
+        case 'd':
+            xz_plane_rotation++;
+            break;
         case 'w':
-            camera.eye.y += DEL;
+            fixed_reference_move_upDown(1.0);
             break;
         case 's':
-            camera.eye.y -= DEL;
+            fixed_reference_move_upDown(-1.0);
             break;
         case '1':
-            // look left
             rotate_eye_left_right(1.0);
             break;
         case '2':
@@ -137,6 +130,36 @@ void usualKeyListener(unsigned char key, int x, int y) {
             sphereToOctahedron();
             break;
     }
+    glutPostRedisplay();
+}
+
+void specialKeyListener(int key, int x, int y) {
+    GLfloat eyeToCentre_x = camera.centre.x - camera.eye.x;
+    GLfloat eyeToCentre_y = camera.centre.z - camera.eye.z;
+    GLfloat proj;
+
+    switch(key) {
+        case GLUT_KEY_UP:
+            translate_eye_forward_backward(1.0);
+            break;
+        case GLUT_KEY_DOWN:
+            translate_eye_forward_backward(-1.0);
+            break;
+        case GLUT_KEY_LEFT:
+            translate_eye_right_left(-1.0);
+            break;
+        case GLUT_KEY_RIGHT:
+            translate_eye_right_left(1.0);
+            break;
+        case GLUT_KEY_PAGE_UP:
+            translate_eye_up_down(1.0);
+            break;
+        case GLUT_KEY_PAGE_DOWN:
+            translate_eye_up_down(-1.0);
+            break;
+        
+    }
+
     glutPostRedisplay();
 }
 

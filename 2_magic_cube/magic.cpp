@@ -73,32 +73,7 @@ void fillCylinder() {
     GLfloat scaledHeight = 0.0 + (cylinder_base_height - 0.0)*(currentCylinderScale*1.0/SCALE_SUBDIVISION);
     GLfloat originNormalToHypotenuse = sqrt(2*0.5*0.5);
     GLfloat toTranslate = 0.0 + (originNormalToHypotenuse - 0.0)*(currentCylinderScale*1.0/SCALE_SUBDIVISION);
-        
-    // 12 cylinder, 4 on each xz, yz, xy plane
-    // int xz = 1;
-    // int yz = 0;
-    // int xy = 0;
-    // for(int j=0;j<2;j++) {
-    //     // draw on each plane-> xz, yz, xy
-    //     // xz
-    //     glPushMatrix();
-    //     glRotatef(45.0, yz, xz, xy);
-    //     for(int i=0;i<4;i++) {
-    //         glPushMatrix();
-    //             glTranslatef(xz*1.0*toTranslate, yz*1.0*toTranslate, xy*1.0*toTranslate);
-    //             drawCylinder(scaledHeight, scaledRadius, CYLINDER_SUBDIVISION);
-    //         glPopMatrix();
-    //         glRotatef(90.0, yz, xz, xy); 
-    //     }
-    //     glPopMatrix();
-    //     // rotate (xz, yz, xy) = (1, 0, 0) to (0, 1, 0) to (0, 0, 1)
-    //     int temp = xy;
-    //     xy = yz;
-    //     yz = xz;
-    //     xz = temp;
-    //     printf("%d %d %d\n", xz, yz, xy);
-    // }
-    // xz plane
+    //xz plane
     glPushMatrix();
         glRotatef(45.0, 0, 1, 0);
         for(int i=0;i<4;i++) {
@@ -134,6 +109,28 @@ void fillCylinder() {
     glPopMatrix();
 }
 
+void drawOctahedron() {
+    glPushMatrix();
+        // glScalef(currentTriangleScale, currentTriangleScale, currentTriangleScale);
+        // glScalef(0.5, 0.5, 0.5);
+        bool col = 1;
+        for(int i=0;i<4;i++) {
+            glColor3f(col, !col, 1);
+            col = !col;
+            drawBasicTriangle();
+            glPushMatrix();
+                glColor3f(col, !col, 1);
+                glRotatef(45.0, 0, 1, 0);
+                glRotatef(180.0, 0, 0, 1);
+                glRotatef(-45.0, 0, 1, 0);
+                drawBasicTriangle();
+            glPopMatrix();
+            glRotatef(90.0, 0, 1, 0);
+            
+        }
+    glPopMatrix();
+}
+
 void display() {
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -144,6 +141,8 @@ void display() {
              camera.centre.x, camera.centre.y, camera.centre.z,
              camera.up.x, camera.up.y, camera.up.z);
 
+    // due to A and D.
+    glRotatef(xz_plane_rotation, 0, 1, 0);
 
     drawAxes();
     drawOctahedron();

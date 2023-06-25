@@ -50,28 +50,6 @@ void drawQuad(point3d a, point3d b, point3d c, point3d d) {
     glEnd();
 }
 
-void drawOctahedron() {
-    glPushMatrix();
-        // glScalef(currentTriangleScale, currentTriangleScale, currentTriangleScale);
-        // glScalef(0.5, 0.5, 0.5);
-        bool col = 1;
-        for(int i=0;i<4;i++) {
-            glColor3f(col, !col, col);
-            col = !col;
-            drawBasicTriangle();
-            glPushMatrix();
-                glColor3f(col, !col, col);
-                glRotatef(45.0, 0, 1, 0);
-                glRotatef(180.0, 0, 0, 1);
-                glRotatef(-45.0, 0, 1, 0);
-                drawBasicTriangle();
-            glPopMatrix();
-            glRotatef(90.0, 0, 1, 0);
-            
-        }
-    glPopMatrix();
-}
-
 void drawAxes() {
     glColor3f(1, 0, 0);
     drawLine(point3d(0, 0, 0), point3d(2, 0, 0));
@@ -144,7 +122,7 @@ void drawCylinder(double height, double radius, int segments) {
             curry = radius * sin(theta);
 
             GLfloat c = (2+cos(theta))/3;
-            glColor3f(c,c,c);
+            glColor3f(1, 1, 0);
             glVertex3f(currx, curry, height/2);
             glVertex3f(currx, curry, -height/2);
 

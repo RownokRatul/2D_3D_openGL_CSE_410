@@ -15,11 +15,15 @@ class Camera {
         point3d up;
         point3d right;
 
-        Camera(point3d e, point3d c, point3d u, point3d r) {
+        Camera(point3d e, point3d c, point3d u) {
             eye = e;
             centre = c;
             up = u;
-            right = r;
+            right = cross_product(eyeToCentreVector(), up);
+        }
+
+        point3d eyeToCentreVector() {
+            return point3d(centre.x-eye.x, centre.y-eye.y, centre.z-eye.z);
         }
 
         Camera() {
